@@ -41,7 +41,7 @@ values."
      ;; auto-completion
      ;; better-defaults
      emacs-lisp
-     ;; git
+     git
      ;; markdown
      ;; org
      ;; (shell :variables
@@ -59,7 +59,13 @@ values."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages
+   '(
+     ;; This package has a bug for Emacs 24.5 see...
+     ;; https://github.com/syl20bnr/spacemacs/issues/9701
+     ;; https://github.com/alpaker/Fill-Column-Indicator/issues/31
+     fill-column-indicator
+     )
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -134,7 +140,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -160,7 +166,7 @@ values."
    ;; and TAB or <C-m> and RET.
    ;; In the terminal, these pairs are generally indistinguishable, so this only
    ;; works in the GUI. (default nil)
-   dotspacemacs-distinguish-gui-tab nil
+   dotspacemacs-distinguish-gui-tab t
    ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
    dotspacemacs-remap-Y-to-y$ nil
    ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
@@ -188,7 +194,7 @@ values."
    ;; auto-save the file in-place, `cache' to auto-save the file to another
    ;; file stored in the cache directory and `nil' to disable auto-saving.
    ;; (default 'cache)
-   dotspacemacs-auto-save-file-location 'cache
+   dotspacemacs-auto-save-file-location 'original
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
    ;; If non nil, `helm' will try to minimize the space it uses. (default nil)
@@ -310,6 +316,37 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  (add-hook 'elixir-mode-hook #'(lambda()
+                                  ;;http://spacemacs.org/doc/FAQ.html#include-underscores-in-word-motions
+                                  (modify-syntax-entry ?_ "w")
+                                  (turn-off-smartparens-mode)))
+
+  ;; http://spacemacs.org/doc/FAQ.html#remap-paste-key-to-be-able-to-paste-copied-text-multiple-times
+  (defun evil-paste-after-from-0 ()
+    (interactive)
+    (let ((evil-this-register ?0))
+      (call-interactively 'evil-paste-after)))
+
+  (define-key evil-visual-state-map "p" 'evil-paste-after-from-0)
+
+  (defun my-dired-up-directory ()
+    "Take dired up one directory, but behave like dired-find-alternate-file"
+    (interactive)
+    (let ((old (current-buffer)))
+      (dired-up-directory)
+      (kill-buffer old)
+      ))
+
+  (with-eval-after-load 'dired
+    (evilified-state-evilify dired-mode dired-mode-map
+      "h"  'my-dired-up-directory
+      "l"  'dired-find-alternate-file))
+
+  ;; (with-eval-after-load 'dired
+  ;;   (evil-define-key 'normal dired-mode-map (kbd "h") 'my-dired-up-directory)
+  ;;   (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-find-alternate-file))
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
