@@ -31,7 +31,11 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     javascript
+     html
+     markdown
      elixir
+     (gtags :variables gtags-enable-by-default t)
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -129,7 +133,7 @@ values."
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
@@ -346,6 +350,12 @@ you should place your code here."
   ;; (with-eval-after-load 'dired
   ;;   (evil-define-key 'normal dired-mode-map (kbd "h") 'my-dired-up-directory)
   ;;   (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-find-alternate-file))
+
+  ;; Prevent emacs from creating lockfiles
+  ;; these lockfiles show up as symbolic links beside the file being edited.
+  (setq create-lockfiles nil)
+
+  (add-hook 'focus-out-hook (lambda () (save-some-buffers t)))
 
   )
 
