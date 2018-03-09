@@ -269,8 +269,8 @@ values."
    ;;                       pdf-view-mode
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
-   ;; (default nil)
-   dotspacemacs-line-numbers nil
+   ;;(default nil)
+   dotspacemacs-line-numbers t
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
@@ -323,7 +323,7 @@ you should place your code here."
 
   (add-hook 'elixir-mode-hook #'(lambda()
                                   ;;http://spacemacs.org/doc/FAQ.html#include-underscores-in-word-motions
-                                  (modify-syntax-entry ?_ "w")
+                                  ;;(modify-syntax-entry ?_ "w")
                                   (turn-off-smartparens-mode)))
 
   ;; http://spacemacs.org/doc/FAQ.html#remap-paste-key-to-be-able-to-paste-copied-text-multiple-times
@@ -356,6 +356,17 @@ you should place your code here."
   (setq create-lockfiles nil)
 
   (add-hook 'focus-out-hook (lambda () (save-some-buffers t)))
+
+  (defun my-web-mode-hook ()
+    "Hooks for Web mode."
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-indent-style 2)
+    )
+  (add-hook 'web-mode-hook  'my-web-mode-hook)
+
+  (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1)
 
   )
 
