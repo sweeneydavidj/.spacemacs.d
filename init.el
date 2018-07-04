@@ -42,7 +42,7 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      helm
-     ;; auto-completion
+     auto-completion
      ;; better-defaults
      emacs-lisp
      git
@@ -198,7 +198,7 @@ values."
    ;; auto-save the file in-place, `cache' to auto-save the file to another
    ;; file stored in the cache directory and `nil' to disable auto-saving.
    ;; (default 'cache)
-   dotspacemacs-auto-save-file-location 'original
+   dotspacemacs-auto-save-file-location 'nil
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
    ;; If non nil, `helm' will try to minimize the space it uses. (default nil)
@@ -363,10 +363,53 @@ you should place your code here."
     (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
     (setq web-mode-indent-style 2)
+    (setq web-mode-script-padding 2)
+    (setq web-mode-style-padding 2)
+    (setq web-mode-block-padding 2)
     )
   (add-hook 'web-mode-hook  'my-web-mode-hook)
 
   (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1)
+
+  ;;https://emacs.stackexchange.com/questions/169/how-do-i-reload-a-file-in-a-buffer
+  (defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
+
+
+  ;;https://www.masteringemacs.org/article/executing-shell-commands-emacs
+  (defun format-elixir ()
+    (interactive)
+    (shell-command-on-region
+     ;; beginning and end of buffer
+     (point-min)
+     (point-max)
+     ;; command and parameters
+     (concat "mix format --check-equivalent " buffer-file-name)
+     ;; output buffer
+     nil
+     ;; replace?
+     nil
+     ;; name of the error buffer
+     "*Format Elixir Error Buffer*"
+     ;; show error buffer?
+     t))
+
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Synchronous-Processes.html
+  (defun my-after-save-actions ()
+      (when (string= (file-name-extension buffer-file-name) "ex")
+        (call-process "mix" nil nil nil "format" buffer-file-name "--check-equivalent")
+        ;;(format-elixir)
+        (revert-buffer-no-confirm)
+        ))
+
+  (add-hook 'after-save-hook 'my-after-save-actions)
+
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+
+  (setq markdown-command "pandoc")
 
   )
 
